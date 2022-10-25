@@ -63,14 +63,6 @@
       <p>
         The increasing complexity of a complete HEP data analysis workflow, possibly interactive, can benefit from highly parallel computing. This can be accomplished within a Python-based framework properly dealing with the standard ROOT format common to all HEP data. With reference to a representative HEP workflow taken as use case and run in a Jupyter framework, we compare the performances of Uproot (a library for reading and writing ROOT files in pure Python and NumPy) and of RDataFrame (the newest ROOT's high-level interface for an efficient data analysis task) by running on multiple CPUs.
       </p>
-      <p>
-        Specifically we measure the total runtime of the sequence of the following operations: 
-        <ol>
-        <il> 1) accessing the TTree inside the input ROOT files; <\il>
-        <il> 2) applying specific filters (selection criteria) on the variables stored in the TTree, in order to extract a known physical signal associated to the decay chain of a beauty meson (B0s → J/psi phi, J/psi→mumu, phi→KK); <\il>
-        <il> 3) converting the TBranch containing the selected invariant mass to a NumPy array for further analysis task       (signal fitting, etc ...). <\il>
-        </ol>
-      </p>
     </article>
 
     <article property="abstract">
@@ -123,33 +115,16 @@
         <h3>Analysis task</h3>
       </header>
 
-      <p>
-        With Uproot and RDataFrame, we measured the total runtime of the following operations:
+       <p>
+        Specifically we measure the total runtime of the sequence of the following operations: 
+        <ol>
+        <il> 1) accessing the TTree inside the input ROOT files; <\il>
+        <il> 2) applying specific filters (selection criteria) on the variables stored in the TTree, in order to extract a known physical signal associated to the decay chain of a beauty meson (B0s → J/psi phi, J/psi→mumu, phi→KK); <\il>
+        <il> 3) converting the TBranch containing the selected invariant mass to a NumPy array for further analysis task       (signal fitting, etc ...). <\il>
+        </ol>
       </p>
-
-      <ol>
-        <li>
-          Accessing the TTree’s in the ROOT files.
-        </li>
-        <li>
-          Applying specific filters (selection criteria) on the data to expose the signal of the B0s meson decaying into
-          the J/psi meson (decaying into two muons) and the Phi meson (decaying into two tracks with Kaon mass
-          assigned).
-        </li>
-        <li>
-          Converting the TBranch containing the mass to a NumPy array.
-        </li>
-      </ol>
-
-    </article>
-
-    <article property="abstract">
-      <header>
-        <h3>Analysis task</h3>
-      </header>
-
-
-      <figure>
+          
+          <figure>
         <img src="plots/dist1.png">
       </figure>
       <figure>
