@@ -168,6 +168,8 @@ article {
   hyphens: auto;
   line-height: 1.35;
   padding: 0 0.5rem 0.5rem 0.5rem;
+  text-align: justify;
+  text-justify: inter-word;
 }
 article > header {
   background: #2e3436;
