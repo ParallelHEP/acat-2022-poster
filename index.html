@@ -77,23 +77,12 @@
       </header>
 
       <p>
-        The ROOT files used in our measurements, which contain 457860912 events and take up more than 128GB of disk
-        space in total, were taken from CMS Run 2 dataset.
+        In this study we use CMS Open Data and the corresponding ROOT files have a total size of about 128GB.
+
       </p>
 
       <p>
-        For reasons that will be specified later, we split the original data set into 128 files with approximately the
-        same size.
-      </p>
-    </article>
-
-    <article property="abstract">
-      <header>
-        <h3>Computing resources</h3>
-      </header>
-
-      <p>
-        Measurements were run on three different machines on the ReCaS-Bari computing center:
+       We use 3 servers of the HPC cluster of the ReCas-Bari Data Center (with a different number of physical cores): 
       </p>
 
       <ol>
@@ -109,9 +98,14 @@
       </ol>
 
       <p>
-        For the first two machines, data could only be stored remotely on the computing cluster, while on
-        <strong>tesla04</strong>, it
-        was also possible to access the data on the local disk.
+        In these tests:
+        <ol>
+          <li> these machine are dedicated exclusively for the performance tests in order to get unbiased results;  </li>
+          <li> the data files are accessed remotely (unless otherwise stated).  </li>
+    </ol>
+    Only on tesla04 the data can be stored locally and it was possible to carry out performances tests in the    
+    cases of  locally vs remotely stored data.
+
       </p>
 
     </article>
