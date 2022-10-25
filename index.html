@@ -121,27 +121,21 @@
 
     <article property="abstract">
       <header>
-        <h3>Setup</h3>
+        <h3>Parallel processing with Uproot & RDataFrame </h3>
       </header>
 
       <p>
-        To take advantage of our multi-core computers, we adopted parallel processing in our measurement. In other
-        words, instead of letting one CPU handle the whole dataset, we used multiple CPUs running in parallel to process
-        pieces of data concurrently.
+        Uproot doesn’t have a built-in option for implicit parallel processing; to enable parallelism, we manually created subprocesses with Python’s multiprocessing module; each subprocess handles a slice of data. 
+A very useful feature of Uproot is that it allows the user to specify the number of events to be processed in each TTree, so it’s always possible to equally split the work (i.e. a similar number of events) among the subprocesses so that they will be characterized by very similar runtime values.
       </p>
 
-    </article>
 
-    <article property="abstract">
-      <header>
-        <h3>Uproot</h3>
-      </header>
 
       <p>
-        With Uproot, there isn’t a built-in option for implicit parallel processing. To enable parallelism, therefore,
-        we manually created subprocesses with Python’s multiprocessing module. Since Uproot allows users to specify the
-        number of events to be processed in each TTree, the smallest unit of data distributed to each subprocess is one
-        event. As a result, the workload can always be divided equally among subprocesses.
+        RDataFrame (RDF) has a built-in option for parallel processing: EnableImplicitMT(n_threads).    We have checked that with ROOT 6.26 it works consistently on different servers. Alternatively we tested that it is also possible to exploit Python’s multiprocessing module to enable parallelism explicitly. 
+      </p>
+      <p>
+        Unlike Uproot, at the time this studies have been performed RDF did not provide the option to specify the number of events to be processed in each file, and can only be parallelized over ROOT files. In other words, each subprocess works on approximately the same number of files rather than the same number of events and thus, in principle, the workload is not divided equally. For example, if we have 5 files but only 4 subprocesses, one subprocess will have to deal with 2 files. Moreover, even when every subprocess handles exactly the same number of files, an uneven workload distribution will happen if the files have different sizes. In both cases the overall runtime of the task is fatefully limited by the slowest subprocess. 
       </p>
 
     </article>
