@@ -279,7 +279,9 @@
       </header>
 
       <p>
-        By keeping the size of data constant and varying the number of processes, we obtained the following results:
+        By keeping the size of data constant (128 files/128GB/4.5 &#183; 10<sup>8</sup> events) and varying the number
+        of processes (at 1 process, there is no parallelism), we
+        obtained the following results:
       </p>
 
       <figure>
@@ -292,8 +294,14 @@
         <img src="plots/rvp3.png">
       </figure>
 
-
-
+      <p>
+        The plots, which show that runtime is inversely proportional to the number of process, are consistent with the
+        runtime functions mentioned above, as we found in other tests that the time C(S, P) is constant. While the
+        curves of Uproot
+        are fairly
+        smooth, we can see a discrete pattern in RDataFrame's plots. This reflects the fact that RDataFrame's smallest
+        unit of data is one file, which is much greater than Uproot's smallest unit of data (one event).
+      </p>
 
     </article>
 
@@ -301,7 +309,11 @@
       <header>
         <h3>Results - Speed-up vs Processes</h3>
       </header>
-
+      <p>
+        From the previous plots, we can calculate how much speed-up we gained by using parallel processing. Speed-up at
+        n
+        processes is the ratio between the runtime at 1 process and the runtime at n processes.
+      </p>
       <figure>
         <img src="plots/svp1.png">
       </figure>
@@ -314,7 +326,7 @@
 
       <p>
         From the plots, it can be observed that we gained a significant performance boost with both Uproot and
-        RDataFrame by implementing parallel processing. . On the machine wn-gpu-8-3-22, for instance, Uproot with
+        RDataFrame by implementing parallel processing. On the machine wn-gpu-8-3-22, for instance, Uproot with
         multiprocessing could be almost 9 times faster than normal. In the case of RDataFrame, we achieved an even more
         striking speed-up: at 128 subprocesses, it was over 50 times faster than without parallelism.
       </p>
@@ -335,7 +347,11 @@
       <header>
         <h3>Results - Runtime vs Size</h3>
       </header>
-
+      <p>
+        By keeping the number
+        of processes constant (at 32 or 64) and varying the size of data, we
+        obtained the following results:
+      </p>
       <figure>
         <img src="plots/rvs1.png">
       </figure>
@@ -345,6 +361,12 @@
       <figure>
         <img src="plots/rvs3.png">
       </figure>
+
+      <p>
+        The plots show that the total runtime is linearly proportional to the size of data, which is what we expected.
+        In RDataFrame's curves, a step-like pattern is observed, which again reflects that with our approach, RDataFrame
+        parallelized over files instead of events.
+      </p>
 
     </article>
 
