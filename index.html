@@ -28,11 +28,14 @@
       <!-- <a href="https://github.com/cpitclaudel/academic-poster-template"><img src="logo.svg" alt="Tutorial logo"></a> -->
     </aside>
     <div>
-      <h1 property="headline">Performance study of HEP data analysis tools</h1>
-      <h2 property="alternativeHeadline">
+      <h1 property="headline">A performance study of HEP data analysis tools</h1>
+      <!-- <h2 property="alternativeHeadline">
         Project carried out at INFN-Sezione di Bari (June - August 2022)
         as part of the DOE-INFN Summer Exchange Program 2022
-      </h2>
+      </h2> -->
+      <!-- <h2 property="alternativeHeadline">
+        Parallel ROOT I/O with Uproot and RDataFrame
+      </h2> -->
       <address>
         <a property="author">Dung Hoang<sup>a</sup></a><a property="author">, Adriano Di Florio<sup>b, d</sup></a></a><a
           property="author">, Alexis Pompili<sup>b, c</sup></a></a><a property="author">, Umit Sozbilir<sup>b,
@@ -147,6 +150,39 @@
 
     <article property="abstract">
       <header>
+        <h3>Parallel processing</h3>
+      </header>
+
+      <p>
+        Instead of letting one CPU handle the whole dataset, we used multiple CPUs running in parallel to process pieces
+        of data concurrently.
+      </p>
+      <p>
+        Without parallelism, the time it takes to complete the analysis task would be:
+      </p>
+
+      \[T = t_u\cdot S\]
+
+      <p>
+        Where T is the total run time, t<sub>u</sub> is the time to process one unit of data, and S is the size of data.
+      </p>
+
+      <p>
+        By implementing parallel processing, this equation becomes:
+      </p>
+
+      \[ T = C(S, P) + t_u\cdot \lceil{S \over P}\rceil \]
+
+      <p>
+        Where C(S, P) is the time to access/split/merge the data and P is the number of concurrent processes. The
+        fraction
+        S/P is rounded up to make sure that no data is lost.
+      </p>
+
+    </article>
+
+    <article property="abstract">
+      <header>
         <h3>Parallel processing with Uproot</h3>
       </header>
 
@@ -154,15 +190,22 @@
         Uproot does not provide a built-in option for implicit parallel processing. To enable parallelism, therefore,
         we manually split the data into smaller chunks and then created subprocesses with Python’s multiprocessing
         module to handle them. Since Uproot allows users to specify the number of events to be processed in each TTree,
-        the smallest unit of data distributed to each subprocess is one event. As a result, the workload can always be
-        divided equally among subprocesses.
+        the smallest unit of data assigned to each subprocess is one event. As a result, data can be distributed
+        very evenly among subprocesses, and the runtime function for Uproot would be:
+      </p>
+
+      \[ T = C(S, P) + t_e\cdot \lceil{S_e \over P}\rceil \]
+
+      <p>
+        Where t<sub>e</sub> is the time to process one <strong>event</strong>, and S<sub>e</sub> is number of
+        <strong>events</strong> in the dataset.
       </p>
 
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Parallel processing RDataFrame </h3>
+        <h3>Parallel processing with RDataFrame</h3>
       </header>
 
       <p>
@@ -184,7 +227,7 @@
 
     <article property="abstract">
       <header>
-        <h3>Parallel processing RDataFrame </h3>
+        <h3>Parallel processing with RDataFrame </h3>
       </header>
 
       <p>
@@ -192,22 +235,52 @@
         of data. Unlike Uproot,
         RDataFrame doesn’t provide the option to specify the number of events to be processed in each file, so the
         smallest unit of data distributed to each subprocess is one
-        file. As a result, each subprocess will work on
-        approximately the same number of files rather than the same number of events.
+        file. As a result, the runtime function for RDataFrame would be:
+      </p>
+
+      \[ T = C(S, P) + t_f\cdot \lceil{S_f \over P}\rceil \]
+
+      <p>
+        Where t<sub>f</sub> is the time to process one <strong>ROOT file</strong>, and S<sub>f</sub> is number of
+        <strong>ROOT files</strong> in the dataset.
       </p>
 
       <p>
-        To make it easier to distribute data evenly with RDataFrame, we split – by using Uproot – the original dataset
-        into 128 files, each containing the
-        same number of events. For a fair comparison, we used these files as input for both Uproot and RDataFrame.
+        If the files had different sizes, t<sub>f</sub> would vary, making it difficult to understand the performance of
+        RDataFrame. To prevent this, therefore, we split the original dataset
+        into 128 files of the same size. For a fair comparison, we used these files as input for both Uproot and
+        RDataFrame.
       </p>
 
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Results</h3>
+        <h3>Results - Local and remote access</h3>
       </header>
+
+      <figure>
+        <img src="plots/localvsremote1.png">
+      </figure>
+      <figure>
+        <img src="plots/localvsremote2.png">
+      </figure>
+
+      <p>
+        We found that accessing the data on local disk resulted in an insignificant increase in
+        performance. In all subsequent measurements, therefore, data were always accessed remotely.
+      </p>
+
+    </article>
+
+    <article property="abstract">
+      <header>
+        <h3>Results - Runtime vs Processes</h3>
+      </header>
+
+      <p>
+        By keeping the size of data constant and varying the number of processes, we obtained the following results:
+      </p>
 
       <figure>
         <img src="plots/rvp1.png">
@@ -219,11 +292,14 @@
         <img src="plots/rvp3.png">
       </figure>
 
+
+
+
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Results</h3>
+        <h3>Results - Speed-up vs Processes</h3>
       </header>
 
       <figure>
@@ -236,11 +312,28 @@
         <img src="plots/svp3.png">
       </figure>
 
+      <p>
+        From the plots, it can be observed that we gained a significant performance boost with both Uproot and
+        RDataFrame by implementing parallel processing. . On the machine wn-gpu-8-3-22, for instance, Uproot with
+        multiprocessing could be almost 9 times faster than normal. In the case of RDataFrame, we achieved an even more
+        striking speed-up: at 128 subprocesses, it was over 50 times faster than without parallelism.
+      </p>
+
+      <p>
+        Expectedly, we didn’t gain anything when we
+        created more subprocesses than the number of CPUs on the machine. This was clearly visible on wn-1-8-9 and
+        tesla04, which have 64 and 32 CPUs, respectively. With Uproot, however, the performance boost peaked at around
+        32 processes, no matter how many CPUs we had. This was because for Uproot, C(S, P) was large, and as a result,
+        it
+        dominated the speed-up gained by creating
+        more processes. In the case of RDataFrame, C(S, P) is relatively insignificant, so we gained performance boost
+        until the maximum number of CPUs is reached.
+      </p>
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Results</h3>
+        <h3>Results - Runtime vs Size</h3>
       </header>
 
       <figure>
@@ -251,20 +344,6 @@
       </figure>
       <figure>
         <img src="plots/rvs3.png">
-      </figure>
-
-    </article>
-
-    <article property="abstract">
-      <header>
-        <h3>Results</h3>
-      </header>
-
-      <figure>
-        <img src="plots/localvsremote1.png">
-      </figure>
-      <figure>
-        <img src="plots/localvsremote2.png">
       </figure>
 
     </article>
@@ -291,16 +370,25 @@
     </figure> -->
   </main>
 
-  <!-- <footer>
-    <address class="monospace"> <a
-        href="https://github.com/cpitclaudel/academic-poster-template">https://github.com/cpitclaudel/academic-poster-template</a>
+  <footer>
+    <address class="monospace">
+      hoadh-23@rhodes.edu
     </address>
-    <address class="monospace"> clement.pitclaudel@live.com
+    <address class="monospace">
+      adriano.diflorio@ba.infn.it
     </address>
-    <span class="credits">
-      Based on an <a href="https://github.com/cpitclaudel/academic-poster-template">open poster template</a>.
-    </span>
-  </footer> -->
+    <address class="monospace">
+      alexis.pompili@ba.infn.it
+    </address>
+    <address class="monospace">
+      umit.sozbilir@cern.ch
+    </address>
+    <address class="monospace">
+      vin.mas21@gmail.com
+    </address>
+    <!-- <span class="credits">
+    </span> -->
+  </footer>
 </body>
 
 </html>
