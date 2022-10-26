@@ -30,7 +30,7 @@
     <div>
       <h1 property="headline">Performance study of HEP data analysis tools</h1>
       <h2 property="alternativeHeadline">
-        Project carried out at INFN-Sezione di Bari (June - August 2022) 
+        Project carried out at INFN-Sezione di Bari (June - August 2022)
         as part of the DOE-INFN Summer Exchange Program 2022
       </h2>
       <address>
@@ -58,19 +58,37 @@
       </header>
 
       <p>
-        The Python programming language is currently characterized by an enormous and rapidly growing “ecosystem” of software tools that adequately supports the analysis and visualization of “Big Data” like those large datasets collected by ongoing High Energy Physics big experiments. These tools and libraries include NumPy (for numerical computing), pandas (for data manipulation), Matplotlib (for visualization), and TensorFlow (a machine learning platform).
-       </p>
+        The Python programming language is currently characterized by an enormous and rapidly growing “ecosystem” of
+        software tools that support the analysis and visualization of “Big Data,” datasets that are too large or
+        complex to be dealt with by traditional data-processing methods. Examples include <a
+          href="https://numpy.org/">Numpy</a> (numerical
+        computing), <a href="https://pandas.pydata.org/">pandas</a> (data manipulation), <a
+          href="https://matplotlib.org/">matplotlib</a> (visualization), and <a
+          href="https://www.tensorflow.org/">tensorflow</a> (machine learning). With the huge and increasingly complex
+        volume of data that large-scale High Energy Physics (HEP) experiments
+        produce, a complete HEP
+        data analysis workflow can provide great benefits.
+      </p>
       <p>
-        The increasing complexity of a complete HEP data analysis workflow, possibly interactive, can benefit from highly parallel computing. This can be accomplished within a Python-based framework properly dealing with the standard ROOT format common to all HEP data. With reference to a representative HEP workflow taken as use case and run in a Jupyter framework, we compare the performances of Uproot (a library for reading and writing ROOT files in pure Python and NumPy) and of RDataFrame (the newest ROOT's high-level interface for an efficient data analysis task) by running on multiple CPUs.
+        In this project, we explored different Python-based
+        approaches to deal with the
+        standard ROOT format common to all HEP data. With reference to a representative HEP workflow taken as use case,
+        we measured the performance of <strong><a href="https://uproot.readthedocs.io/en/latest/">Uproot</a></strong>, a
+        library for reading and writing ROOT
+        files in pure Python and NumPy, and of <strong><a
+            href="https://root.cern/doc/master/classROOT_1_1RDataFrame.html">RDataFrame</a></strong>, the modern ROOT's
+        high-level interface for efficient data
+        analysis. To match the performance of a traditional C++ ROOT workflow, we also adopted parallel processing in
+        our study.
       </p>
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Data and setup</h3>
+        <h3>Data and computing resources</h3>
       </header>
       <p>
-      In this study we use CMS Open Data and the corresponding ROOT files have a total size of about 128GB.
+        The ROOT files used in our study, which have a total size of about 128GB, were taken from CMS Open Data.
       </p>
       <p>
         Measurements were run on three different machines on the ReCaS-Bari computing center:
@@ -91,7 +109,12 @@
       <p>
         For the first two machines, data could only be stored remotely on the computing cluster, while on
         <strong>tesla04</strong>, it
-        was also possible to access the data on the local disk.
+        was possible to access the data on the local disk.
+      </p>
+      <p>
+        <strong>tesla04</strong> was also the only computer on which we could install the latest version of ROOT (6.26).
+        To make fair comparison between different computers, therefore, all measurements were run with ROOT 6.24 unless
+        otherwise specified.
       </p>
 
     </article>
@@ -101,16 +124,19 @@
         <h3>Analysis task</h3>
       </header>
 
-       <p>
-        Specifically we measure the total runtime of the sequence of the following operations: 
-        <ol>
+      <p>
+        Specifically we measure the total runtime of the sequence of the following operations:
+      <ol>
         <li> accessing the TTree inside the input ROOT files; </li>
-        <li> applying specific filters (selection criteria) on the variables stored in the TTree, in order to extract a known physical signal associated to the decay chain of a beauty meson (B0s → J/psi phi, J/psi→mumu, phi→KK); </li>
-        <li> converting the TBranch containing the selected invariant mass to a NumPy array for further analysis task       (signal fitting, etc ...). </li>
-        </ol>
+        <li> applying specific filters (selection criteria) on the variables stored in the TTree, in order to extract a
+          known physical signal associated to the decay chain of a beauty meson (B0s → J/psi phi, J/psi→mumu, phi→KK);
+        </li>
+        <li> converting the TBranch containing the selected invariant mass to a NumPy array for further analysis task
+          (signal fitting, etc ...). </li>
+      </ol>
       </p>
-          
-          <figure>
+
+      <figure>
         <img src="plots/dist1.png" style="width:90%">
       </figure>
       <figure>
@@ -121,28 +147,22 @@
 
     <article property="abstract">
       <header>
-        <h3>Parallel processing with Uproot & RDataFrame </h3>
+        <h3>Parallel processing with Uproot</h3>
       </header>
 
       <p>
-        Uproot doesn’t have a built-in option for implicit parallel processing; to enable parallelism, we manually created subprocesses with Python’s multiprocessing module; each subprocess handles a slice of data. 
-A very useful feature of Uproot is that it allows the user to specify the number of events to be processed in each TTree, so it’s always possible to equally split the work (i.e. a similar number of events) among the subprocesses so that they will be characterized by very similar runtime values.
-      </p>
-
-
-
-      <p>
-        RDataFrame (RDF) has a built-in option for parallel processing: EnableImplicitMT(n_threads).    We have checked that with ROOT 6.26 it works consistently on different servers. Alternatively we tested that it is also possible to exploit Python’s multiprocessing module to enable parallelism explicitly. 
-      </p>
-      <p>
-        Unlike Uproot, at the time this studies have been performed RDF did not provide the option to specify the number of events to be processed in each file, and can only be parallelized over ROOT files. In other words, each subprocess works on approximately the same number of files rather than the same number of events and thus, in principle, the workload is not divided equally. For example, if we have 5 files but only 4 subprocesses, one subprocess will have to deal with 2 files. Moreover, even when every subprocess handles exactly the same number of files, an uneven workload distribution will happen if the files have different sizes. In both cases the overall runtime of the task is fatefully limited by the slowest subprocess. 
+        Uproot does not provide a built-in option for implicit parallel processing. To enable parallelism, therefore,
+        we manually split the data into smaller chunks and then created subprocesses with Python’s multiprocessing
+        module to handle them. Since Uproot allows users to specify the number of events to be processed in each TTree,
+        the smallest unit of data distributed to each subprocess is one event. As a result, the workload can always be
+        divided equally among subprocesses.
       </p>
 
     </article>
 
     <article property="abstract">
       <header>
-        <h3>RDataFrame</h3>
+        <h3>Parallel processing RDataFrame </h3>
       </header>
 
       <p>
@@ -164,7 +184,7 @@ A very useful feature of Uproot is that it allows the user to specify the number
 
     <article property="abstract">
       <header>
-        <h3>RDataFrame</h3>
+        <h3>Parallel processing RDataFrame </h3>
       </header>
 
       <p>
