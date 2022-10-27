@@ -331,7 +331,7 @@ RDF has a built-in option for parallel processing: EnableImplicitMT(n_threads). 
       <p>
         The plots show that runtime decreases with the increasing number of processes and saturates when hitting the about constant time C(S, P) needed for initialization and final merging.
       <br>
-While the Uproot curves are fairly smooth, we can appreciate a discrete pattern in RDF ones. This reflects the fact that RDF’s smallest unit of data is one file and not just one event.
+While the Uproot curves are fairly smooth, we can appreciate a ladder pattern in RDF ones. This reflects the fact that RDF’s smallest unit of data is one file and not just one event.
       </p>
     </article>
 
@@ -389,7 +389,7 @@ Another way of studying the performance consists in varying the size of data whi
 
       <p>
         The total runtime is linearly proportional to the data size, as expected.
-        In RDF curves, the observed step-like pattern seems to reflect that RDF
+        In RDF curves, the observed ladder pattern seems to reflect that RDF
         is parallelized over files instead of events (reminder: each file has a size of ~1GB).
       </p>
 
