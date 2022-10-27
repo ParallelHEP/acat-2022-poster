@@ -296,13 +296,13 @@ Thus the main studies are carried out by accessing data remotely, without biasin
         <h3>Preliminary studies: ROOT 6.24 vs 6.26</h3>
       </header>
 <p>
-RDF has a built-in option for parallel processing: EnableImplicitMT(). We experienced an unstable behavior - on ROOT 6.24 - when letting this method autonomously optimize the number of threads. We have checked that upgrading to ROOT 6.26 this issue disappears: 
+RDF has a built-in option for parallel processing: EnableImplicitMT(n_threads). We experienced an unstable behavior - on ROOT 6.24 - when letting this method autonomously optimize the number of threads or even when setting n_threads. We have checked that upgrading to ROOT 6.26 this issue disappears: 
 </p>
      <figure>
         <img src="plots/implicitmt2.png">
       </figure>
 
-      <p>In the main tests we manually set the number of processes by setting n_threads in the method: EnableImplicitMT(n_htreads).
+      <p>In the tests we used ROOT 6.24 and instead of using RDF EnableImplicitMT() we used Python's multiprocessing, just like we did with Uproot.
 </p>
 
     </article>
@@ -315,7 +315,7 @@ RDF has a built-in option for parallel processing: EnableImplicitMT(). We experi
       </header>
 
       <p>
-        By keeping the size of data constant (128 files/128GB/4.5 &#183; 10<sup>8</sup> events) we obtain the following runtime as a function of the number of processes, for each used server:
+        By keeping the size of data constant (128 files for 128GB carrying info about /4.5 &#183; 10<sup>8</sup> events) we obtain the following runtime as a function of the number of processes, for each used server:
       </p>
 
       <figure>
